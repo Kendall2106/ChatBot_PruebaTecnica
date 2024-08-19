@@ -140,6 +140,32 @@ h3 {
     background-color: #1973bd;
 }
 
+#predefined-options {
+    margin-top: 10px;
+}
+
+#predefined-options p {
+    font-weight: bold;
+}
+
+.option-btn {
+    display: block;
+    background-color: #f0f0f0;
+    border: none;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+}
+
+.option-btn:hover {
+    background-color: #ddd;
+}
+
+.hidden {
+    display: none;
+}
+
+
 i{
     font-size: 24px;
 }
@@ -181,3 +207,5 @@ i{
         right: 10px;
     }
 }
+
+

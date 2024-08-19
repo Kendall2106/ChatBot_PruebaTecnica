@@ -28,8 +28,7 @@ class DataChatBot {
       if (result.length > 0) {
         return { response: result[0].item.answer };
       } else {
-        return { response: "No estoy seguro de entender tu pregunta. Puedes preguntar sobre temas como el horario de atención,"+ 
-          "cómo contactar con soporte técnico, o información sobre nuestros servicios. ¿Te gustaría probar alguna de estas preguntas?" };
+        return { response: "No estoy seguro de entender tu pregunta." };
       }
     } catch (err) {
       throw new Error('Hubo un error en el servidor.');

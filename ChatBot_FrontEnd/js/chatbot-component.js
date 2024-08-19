@@ -1,7 +1,7 @@
 import { fetchChatBot } from './chatbot-service.js';
 
 class ChatBot extends HTMLElement {
-    
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -28,12 +28,19 @@ class ChatBot extends HTMLElement {
 
                 <div id="chat-window">
                     <div id="output"></div>
+                    <div id="predefined-options" class="hidden">
+                        <button class="option-btn">¿Cómo contactar con soporte técnico?</button>
+                        <button class="option-btn">¿Cuáles servicios ofrecen?</button>
+                        <button class="option-btn">¿Cuál es el horario de atención?</button>
+                    </div>
                 </div>
                 <div id="input-container">
                     <input id="user-input" type="text" placeholder="Escribe tu mensaje aquí..." autofocus>
                     <button id="send-btn"><i class="uil uil-message"></i></button>
                 </div>
             </div>
+
+            
             <button id="chatbot-toggle-btn"><i class="uil uil-comment-dots"></i></button>
         `;
     }
@@ -57,11 +64,46 @@ class ChatBot extends HTMLElement {
         this.closeBtn.addEventListener('click', () => this.closeChat());
     }
 
+    // Shows the predefined options to choose from if you do not recognize the question
+    showPredefinedOptions() {
+        const predefinedOptions = this.shadowRoot.querySelector('#predefined-options');
+        predefinedOptions.classList.remove('hidden');
+
+        const optionButtons = predefinedOptions.querySelectorAll('.option-btn');
+
+        // Remove any previous duplicate listeners
+        optionButtons.forEach(button => {
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+
+
+            newButton.addEventListener('click', (e) => {
+                this.optionSelection(e.target.textContent);
+            });
+        });
+    }
+
+    // Displays the message selected by the user
+    optionSelection(option) {
+
+        this.appendMessage('user-message', option);
+
+        fetchChatBot(option)
+            .then(response => {
+                this.appendMessage('bot-message', response);
+            })
+            .catch(() => {
+                this.appendMessage('bot-message', 'Lo siento, hubo un error al procesar tu mensaje.');
+            });
+
+        const predefinedOptions = this.shadowRoot.querySelector('#predefined-options');
+        predefinedOptions.classList.add('hidden');
+    }
+
 
     //Send the user's message to the chatbot and show the response
     sendMessage() {
         const message = this.userInput.value.trim();
-
         if (message === '') return;
 
         this.appendMessage('user-message', message);
@@ -69,7 +111,12 @@ class ChatBot extends HTMLElement {
 
         fetchChatBot(message)
             .then(response => {
-                this.appendMessage('bot-message', response);
+                if (response === 'No estoy seguro de entender tu pregunta.') {
+                    this.appendMessage('bot-message', response + " ¿Te refieres a alguna de estas preguntas?");
+                    this.showPredefinedOptions();
+                } else {
+                    this.appendMessage('bot-message', response);
+                }
             })
             .catch(() => {
                 this.appendMessage('bot-message', 'Lo siento, hubo un error al procesar tu mensaje.');
